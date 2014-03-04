@@ -18,6 +18,9 @@
 
 %%
 
+start : object
+      ;
+
 object : '{' '}'
        | '{' members '}'
        ;
@@ -115,9 +118,9 @@ expr : expr '=' expr
      | '-' expr  %prec '!'
      | '+' expr  %prec '!'
      | '(' expr ')'
-     | value '.' IDENT
-     | value '[' value ']'
-     | value '(' args ')'
+     | expr '.' IDENT
+     | expr '[' expr ']'
+     | expr '(' args ')'
      | value
      ;
 
