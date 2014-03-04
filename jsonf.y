@@ -29,16 +29,16 @@ members : pair
         | members ',' pair
         ;
 
-pair : STRING ':' value
-     | IDENT ':' value
+pair : STRING ':' expr
+     | IDENT ':' expr
      ;
 
 array : '[' ']'
       | '[' elements ']'
       ;
 
-elements : value
-         | elements ',' value
+elements : expr
+         | elements ',' expr
          ;
 
 value : STRING
