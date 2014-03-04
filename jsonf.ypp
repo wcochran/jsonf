@@ -1,0 +1,169 @@
+%{
+#include <vector>
+#include <list>
+#include <map>
+#include "Expr.h"
+#include "Stmt.h"
+
+using namespace std;
+%}
+
+%union {
+  char *cstr;
+  double num;
+  Expr *expr;
+  list<Expr*> *exprs;
+  Member *member;
+  list<Member*> *members;
+  list<string> *strs;
+  Stmt *stmt;
+  list<Stmt*> *stmts;
+  Var *var;
+  list<Var*> *vars;
+}
+
+%token <cstr> STRING
+%token <cstr> IDENT
+%token <num> NUMBER
+%token TRUE FALSE NULL
+%token FUNC VAR IF ELSE WHILE RETURN
+
+%type <expr> object array value func expr
+%type <members> members
+%type <member> pair
+%type <exprs> elements args actuals
+%type <strs> params formals
+%type <stmt> stmt block_stmt decl if_stmt while_stmt
+%type <stmts> stmts
+%type <var> var
+%type <vars> vars
+
+%right '='
+%left OR
+%left AND
+%nonassoc EQ NE
+%nonassoc '<' LE '>' GE
+%left '-' '+'
+%left '*' '/' '%'
+%right '!'
+%left '.' '[' '('
+
+%expect 1
+
+%%
+
+start : object
+      ;
+
+object : '{' '}'                {$$ = new ObjectExpr;}
+       | '{' members '}'        {$$ = new ObjectExpr($2);}
+       ;
+
+members : pair                  {$$ = new list<Member*>; $$->push_back($1);}
+        | members ',' pair      {$$ = $1; $$->push_back($3);}
+        ;
+
+pair : STRING ':' expr          {$$ = new Member($1,$3);}
+     | IDENT ':' expr           {$$ = new Member($1,$3);}
+     ;
+
+array : '[' ']'                 {$$ = new ArrayExpr;}
+      | '[' elements ']'        {$$ = new ArrayExpr($2);}
+      ;
+
+elements : expr                 {$$ = new list<Expr*>; $$->push_back($1);}
+         | elements ',' expr    {$$ = $1; $$->push_back($3);}
+         ;
+
+value : STRING                  {$$ = new StringExpr($1);}
+      | NUMBER                  {$$ = new NumberExpr($1);}
+      | object
+      | array
+      | TRUE                    {$$ = new BoolExpr(true);}
+      | FALSE                   {$$ = new BoolExpr(false);}
+      | NULL                    {$$ = new NullExpr;}
+      | func
+      ;
+
+func : FUNC params block_stmt   {$$ = new FuncExpr($2,$3);}
+     ;
+
+params : '(' ')'                {$$ = new list<string>;}
+       | '(' formals ')'        {$$ = $2;}
+       ;
+
+formals : IDENT                 {$$ = new list<string>; $$->push_back($1);}
+        | formals ',' IDENT     {$$ = $1; $$->push_back($3);}
+        ;
+
+stmt : ';'                      {$$ = new NoopStmt;}
+     | block_stmt
+     | decl
+     | expr ';'                 {$$ = new ExprStmt($1);}
+     | if_stmt
+     | while_stmt
+     | return_stmt
+     ;
+
+block_stmt : '{' stmts '}'      {$$ = new BlockStmt($2);}
+           ;
+
+stmts : stmt                    {$$ = new list<Stmt*>; $$->push_back($1);}
+      | stmts stmt              {$$ = $1; $$->push_back($2);}
+      ;
+
+decl  : VAR vars ';'            {$$ = new DeclStmt($2);}
+      ;
+
+vars : var                      {$$ = new list<Var*>; $$->push_back($1);}
+     | vars ',' var             {$$ = $1; $$->push_back($3);}
+     ;
+
+var : IDENT                     {$$ = new Var($1);}
+    | IDENT '=' expr            {$$ = new Var($1,$3);}
+    ;
+
+if_stmt : IF '(' expr ')' stmt              {$$ = new IfStmt($3,$5);}
+        | IF '(' expr ')' stmt ELSE stmt    {$$ = new IfStmt($3,$5,$7);}
+        ;
+
+while_stmt : WHILE '(' expr ')' stmt   {$$ = new WhileStmt($3,$5);}
+           ;
+
+return_stmt : RETURN expr ';'  {$$ = new ReturnStmt($2);}
+            | RETURN ';'       {$$ = new ReturnStmt;}
+            ;
+
+expr : expr '=' expr           {$$ = new AssignExpr($1,$3);}
+     | expr OR expr            {$$ = new BinaryExpr(OR_OP,$1,$3);}
+     | expr AND expr           {$$ = new BinaryExpr(AND_OP,$1,$3);}
+     | expr EQ expr            {$$ = new BinaryExpr(EQ_OP,$1,$3);}
+     | expr NE expr            {$$ = new BinaryExpr(NE_OP,$1,$3);}
+     | expr '<' expr           {$$ = new BinaryExpr(LT_OP,$1,$3);}
+     | expr LE expr            {$$ = new BinaryExpr(LE_OP,$1,$3);}
+     | expr '>' expr           {$$ = new BinaryExpr(GT_OP,$1,$3);}
+     | expr GE expr            {$$ = new BinaryExpr(GE_OP,$1,$3);}
+     | expr '+' expr           {$$ = new BinaryExpr(ADD_OP,$1,$3);}
+     | expr '-' expr           {$$ = new BinaryExpr(SUB_OP,$1,$3);}
+     | expr '*' expr           {$$ = new BinaryExpr(MUL_OP,$1,$3);}
+     | expr '/' expr           {$$ = new BinaryExpr(DIV_OP,$1,$3);}
+     | expr '%' expr           {$$ = new BinaryExpr(MOD_OP,$1,$3);}
+     | '!' expr                {$$ = new UnaryExpr(NOT_OP,$2);}
+     | '-' expr  %prec '!'     {$$ = new UnaryExpr(NEG_OP,$2);}
+     | '+' expr  %prec '!'     {$$ = $2;}
+     | '(' expr ')'            {$$ = $2;}
+     | expr '.' IDENT          {$$ = new MemberRefExpr($1,$3);}
+     | expr '[' expr ']'       {$$ = new ArrayRefExpr($1,$3);}
+     | expr '(' args ')'       {$$ = new CallExpr($1,$3);}
+     | value
+     ;
+
+args :                         {$$ = new list<Expr*>;}
+     | actuals
+     ;
+
+actuals : expr                 {$$ = new list<Expr*>; $$->push_back($1);}
+        | actuals ',' expr     {$$ = $1; $$->push_back($3);}
+        ;
+
+%%
