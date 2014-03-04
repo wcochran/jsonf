@@ -88,6 +88,15 @@ public:
   virtual Value *eval(Env *env);
 };
 
+//
+// XXX No closure support for now.
+// If we did, we would need to retain the
+// referencing environment the function expression
+// lives in. This will also introduce memory
+// management hell (probably will need to use
+// reference counting / smart ptrs or something).
+//
+
 class FuncExpr : public Expr {
   std::list<std::string> *_params;
   Stmt *_body;

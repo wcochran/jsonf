@@ -5,6 +5,9 @@ JSON + Functions : JSON-with-functions interpretter that expands jsonf into trad
 
 Author : Wayne O. Cochran wcochran@vancouver.wsu.edu
 
+Notes:
+* No function closure support for initial implementation.
+
 Files:
 * jsonf.y ............. yacc grammar
 * jsonf.ypp ........... bison parser source code
