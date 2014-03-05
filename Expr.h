@@ -13,10 +13,9 @@ extern int yylineno;
 
 class Expr {
   const int _lineno;
-  Value *_cachedValue;
 public:
-  Expr() : _lineno(yylineno), _cachedValue(0) {}
-  virtual ~Expr() {delete _cachedValue;}
+  Expr() : _lineno(yylineno) {}
+  virtual ~Expr() {}
   virtual Value *eval(Env *env) = 0;
 };
 
@@ -26,7 +25,6 @@ struct Member {
   Expr *_expr;
   Member(const std::string& n, Expr *e) 
     : _lineno(yylineno), _name(n), _expr(e) {}
-  ~Member() {delete _expr;}
 };
 
 class ObjectExpr : public Expr {
@@ -34,7 +32,6 @@ class ObjectExpr : public Expr {
   std::map<string,Expr*> _table;
 public:
   ObjectExpr() : _members(0), _table() {}
-  virtual ~ObjectExpr();
   ObjectExpr(std::list<Member*> *members) : _members(*members), _table() {
     std::list<Member*>::iterator iter = _members->begin();
     while (iter != _members->end()) {
@@ -54,7 +51,6 @@ class ArrayExpr : public Expr {
   std::vector<Expr*> _array;
 public:
   ArrayExpr() : _elems(0), _array() {}
-  virtual ~ObjectExpr();
   ArrayExpr(std::list<Expr*> *elems) : _elems(elems), _array(*elems) {}
   Expr *index(int i) {return _array[i];}
   size_t size() const {return _array.size();}
@@ -89,12 +85,7 @@ public:
 };
 
 //
-// XXX No closure support for now.
-// If we did, we would need to retain the
-// referencing environment the function expression
-// lives in. This will also introduce memory
-// management hell (probably will need to use
-// reference counting / smart ptrs or something).
+// No closure support for now.
 //
 
 class FuncExpr : public Expr {
@@ -103,7 +94,6 @@ class FuncExpr : public Expr {
 public:
   FuncExpr(std::list<std::string> *params, Stmt *body) 
     : _params(params), _body(body) {}
-  virtual ~FuncExpr() {delete _params; delete _body;}
   Value *call(const std::list<Expr*>& actuals);
   virtual Value *eval(Env *env);
 };
@@ -112,7 +102,6 @@ class AssignExpr : public Expr {
   Expr *_lval, *_rval;
 public:
   AssignExpr(Expr *lval, Expr *rval) : _lval(lval), _rval(rval) {}
-  virtual ~AssignExpr() {delete _lval; delete _rval;}
   virtual Value *eval(Env *env);
 };
 
@@ -128,7 +117,6 @@ class BinaryExpr : public Expr {
   Expr *_left, *right;
 public:
   BinaryExpr(ExprOp op, Expr *l, Expr *r) : _op(op), _left(l), _right(r) {}
-  virtual ~BinaryExpr() {delete _left; delete _right;}
   virtual Value *eval(Env *env);
 };
 
@@ -137,7 +125,6 @@ class UnaryExpr : public Expr {
   Expr *_expr;
 public:
   UnaryOp(ExprOp op, Expr *e) : _op(op), _expr(e) {}
-  virtual ~UnaryOp() {delete _expr;}
   virtual Value *eval(Env *env);
 };
 
@@ -147,7 +134,6 @@ class MemberRefExpr : public Expr {
 public:
   MemberRefExpr(Expr *object, const std::string& field)
     : _object(object), _field(field) {}
-  virtual ~MemberRefObject() {delete _object;}
   virtual Value *eval(Env *env);
 };
 
@@ -156,7 +142,6 @@ class ArrayRefExpr : public Expr {
 public:
   ArrayRefExpr(Expr *array, Expr *index) 
     : _array(object), _index(index) {}
-  virtual ~ArrayRefObject() {delete _array; delete _index;}
   virtual Value *eval(Env *env);
 };
 
@@ -166,7 +151,6 @@ class CallExpr : public Expr {
 public:
   CallExpr(Expr *f, std::list<Expr*> *args)
     : _func(f), _args(args) {}
-  virtual ~CallExpr();
   virtual Value *eval(Env *env);
 };
 

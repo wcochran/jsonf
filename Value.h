@@ -39,7 +39,6 @@ struct ObjectValue  : public Value {
   std::list<pair<std::string,Value*> > _members;
   ObjectValue(const std::list<pair<std::string,Value*> >& members)
     : Value(OBJECT_VALUE), _members(members) {}
-  virtual ~ObjectValue();
   virtual std::ostream& print(std::ostream& os, int indent);
 };
 
@@ -47,7 +46,6 @@ struct ArrayValue : public Value {
   std::vector<Value*> _array;
   ArrayValue(const std::vector<Value*>& array)
     : Value(ARRAY_VALUE), _array(array) {}
-  virtual ~ArrayValue() {}
   virtual std::ostream& print(std::ostream& os, int indent);
 };
 
