@@ -6,7 +6,7 @@
 #include <string>
 
 class Env {
-  std::map<string,Value*> _tbl;
+  std::map<std::string,Value*> _tbl;
   Env *_prev;
 public:
   Env(Env *prev) : _tbl(), _prev(prev) {}

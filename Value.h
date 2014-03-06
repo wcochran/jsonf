@@ -6,64 +6,59 @@
 #include <list>
 #include <vector>
 
+class Expr;
+
 enum ValueType {
   STRING_VALUE,
-  NUMBER_VALUE,
+  NUM_VALUE,
   OBJECT_VALUE,
   ARRAY_VALUE,
-  BOOLEAN_VALUE,
+  BOOL_VALUE,
   NULL_VALUE,
   FUNC_VALUE
 };
 
 struct Value {
-  const ValueType type;
-  Value (ValueType t) : type(t) {}
+  const ValueType _type;
+  Value (ValueType t) : _type(t) {}
   virtual ~Value() {}
-  virtual std::ostream& print(std::ostream& os, int indent) = 0;
+  virtual std::ostream& print(std::ostream& os, int indent) {return os;}
 };
 
 struct StringValue : public Value {
-  const std::string str;
-  StringValue(const std::string& s) : Value(STRING_VALUE), str(s) {}
-  virtual std::ostream& print(std::ostream& os, int indent);
+  const std::string _str;
+  StringValue(const std::string& s) : Value(STRING_VALUE), _str(s) {}
 };
 
-struct NumberValue : public Value {
-  double number;
-  NumberValue(double n) : Value(NUMBER_VALUE), number(n) {}
-  virtual std::ostream& print(std::ostream& os, int indent);
+struct NumValue : public Value {
+  double _num;
+  NumValue(double n) : Value(NUM_VALUE), _num(n) {}
 };
 
 struct ObjectValue  : public Value {
-  std::list<pair<std::string,Value*> > _members;
-  ObjectValue(const std::list<pair<std::string,Value*> >& members)
+  std::list<std::pair<std::string,Value*> > _members;
+  ObjectValue(const std::list<std::pair<std::string,Value*> >& members)
     : Value(OBJECT_VALUE), _members(members) {}
-  virtual std::ostream& print(std::ostream& os, int indent);
 };
 
 struct ArrayValue : public Value {
   std::vector<Value*> _array;
   ArrayValue(const std::vector<Value*>& array)
     : Value(ARRAY_VALUE), _array(array) {}
-  virtual std::ostream& print(std::ostream& os, int indent);
 };
 
 struct BoolValue : public Value {
-  const bool val;
-  BoolValue(bool v) : Value(BOOL_VALUE), val(v) {}
-  virtual std::ostream& print(std::ostream& os, int indent);
+  const bool _bool;
+  BoolValue(bool b) : Value(BOOL_VALUE), _bool(b) {}
 };
 
 struct NullValue : public Value {
   NullValue() : Value(NULL_VALUE) {}
-  virtual std::ostream& print(std::ostream& os, int indent);
 };
 
 struct FuncValue : public Value {
   Expr *_func;
   FuncValue(Expr *f) : Value(FUNC_VALUE), _func(f) {}
-  virtual std::ostream& print(std::ostream& os, int indent);
 };
 
 #endif // VALUE_H

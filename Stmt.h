@@ -10,31 +10,23 @@
 
 extern int yylineno;
 
-class Stmt {
+struct Stmt {
   const int _lineno;
-public:
   Stmt() : _lineno(yylineno) {}
   virtual ~Stmt() {}
-  virtual Value *execute(Env *env) = 0;
 };
 
-class NoopStmt : public Stmt {
-public:
-  virtual Value *execute(Env *env);
+struct NoopStmt : public Stmt {
 };
 
-class ExprStmt : public Stmt {
+struct ExprStmt : public Stmt {
   Expr *_expr;
-public:
   ExprStmt(Expr *e) : _expr(e) {}
-  virtual Value *execute(Env *env);
 };
 
-class BlockStmt : public Stmt {
+struct BlockStmt : public Stmt {
   std::list<Stmt*> *_stmts;
-public:
-  BlockState(std::list<Stmt*> *stmts) : _stmts(stmts) {}
-  virtual Value *execute(Env *env);
+  BlockStmt(std::list<Stmt*> *stmts) : _stmts(stmts) {}
 };
 
 struct Var {
@@ -43,27 +35,27 @@ struct Var {
   Var(const std::string& n, Expr *e=0) : _name(n), _expr(e) {}
 };
 
-class DeclStmt : public Stmt {
+struct DeclStmt : public Stmt {
   std::list<Var*> *_vars;
-public:
   DeclStmt(std::list<Var*> *vars) : _vars(vars) {}
-  virtual Value *execute(Env *env);
 };
 
-class IfStmt : public Stmt {
+struct IfStmt : public Stmt {
   Expr *_cond;
   Stmt *_yesStmt, *_noStmt;
-public:
   IfStmt(Expr *cond, Stmt *yes, Stmt *no=0) 
     : _cond(cond), _yesStmt(yes), _noStmt(no) {}
-  virtual Value *execute(Env *env);
 };
 
-class ReturnStmt : public Stmt {
+struct WhileStmt : public Stmt {
+  Expr *_cond;
+  Stmt *_body;
+  WhileStmt(Expr *cond, Stmt *body) : _cond(cond), _body(body) {}
+};
+
+struct ReturnStmt : public Stmt {
   Expr *_expr;
-public:
   ReturnStmt(Expr *e=0) : _expr(0) {}
-  virtual Value *execute(Env *env);
 };
 
 #endif

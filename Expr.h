@@ -7,16 +7,17 @@
 #include "Value.h"
 #include "Env.h"
 
-class Stmt;
+struct Stmt;
 
 extern int yylineno;
 
 class Expr {
-  const int _lineno;
 public:
+  const int _lineno;
   Expr() : _lineno(yylineno) {}
   virtual ~Expr() {}
-  virtual Value *eval(Env *env) = 0;
+  virtual Value *eval(Env *env) {return 0;} // XXX
+  virtual std::ostream& print(std::ostream& os, int indent) = 0;  
 };
 
 struct Member {
@@ -25,68 +26,49 @@ struct Member {
   Expr *_expr;
   Member(const std::string& n, Expr *e) 
     : _lineno(yylineno), _name(n), _expr(e) {}
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
 
 class ObjectExpr : public Expr {
   std::list<Member*> *_members;
-  std::map<string,Expr*> _table;
 public:
-  ObjectExpr() : _members(0), _table() {}
-  ObjectExpr(std::list<Member*> *members) : _members(*members), _table() {
-    std::list<Member*>::iterator iter = _members->begin();
-    while (iter != _members->end()) {
-      _table[(*iter)->_name] = (*iter)->_expr;
-      ++iter;
-    }
-  }
-  Expr *lookup(const std::string* n) {
-    std::map<string,Expr*>::iterator iter = _table->find(n);
-    return (iter == _table->end()) ? 0 : iter->second;
-  }
-  virtual Value *eval(Env *env);
+  ObjectExpr(std::list<Member*> *members = 0) : _members(members) {}
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
 
 class ArrayExpr : public Expr {
   std::list<Expr*> *_elems;
-  std::vector<Expr*> _array;
 public:
-  ArrayExpr() : _elems(0), _array() {}
-  ArrayExpr(std::list<Expr*> *elems) : _elems(elems), _array(*elems) {}
-  Expr *index(int i) {return _array[i];}
-  size_t size() const {return _array.size();}
-  virtual Value *eval(Env *env);
+  ArrayExpr(std::list<Expr*> *elems = 0) : _elems(elems) {}
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
 
 class StringExpr : public Expr {
 public:
-  const std::string str;
-  StringExpr(const std::string& s) : str(s) {}
-  virtual Value *eval(Env *env);
+  const std::string _str;
+  StringExpr(const std::string& s) : _str(s) {}
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
 
-class NumberExpr : public Expr {
+class NumExpr : public Expr {
 public:
-  const double num;
-  NumberExpr(double n) : num(n) {}
-  virtual Value *eval(Env *env);
+  const double _num;
+  NumExpr(double n) : _num(n) {}
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
 
 class BoolExpr : public Expr {
 public:
-  const bool val;
-  BoolExpe(bool v) : val(b) {}
-  virtual Value *eval(Env *env);
+  const bool _bool;
+  BoolExpr(bool b) : _bool(b) {}
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
 
 class NullExpr : public Expr {
 public:
-  NullExpr(bool v) {}
-  virtual Value *eval(Env *env);
+  NullExpr() {}
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
-
-//
-// No closure support for now.
-//
 
 class FuncExpr : public Expr {
   std::list<std::string> *_params;
@@ -94,15 +76,14 @@ class FuncExpr : public Expr {
 public:
   FuncExpr(std::list<std::string> *params, Stmt *body) 
     : _params(params), _body(body) {}
-  Value *call(const std::list<Expr*>& actuals);
-  virtual Value *eval(Env *env);
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
 
 class AssignExpr : public Expr {
   Expr *_lval, *_rval;
 public:
   AssignExpr(Expr *lval, Expr *rval) : _lval(lval), _rval(rval) {}
-  virtual Value *eval(Env *env);
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
 
 enum ExprOp {
@@ -114,18 +95,18 @@ enum ExprOp {
 
 class BinaryExpr : public Expr {
   ExprOp _op;
-  Expr *_left, *right;
+  Expr *_left, *_right;
 public:
   BinaryExpr(ExprOp op, Expr *l, Expr *r) : _op(op), _left(l), _right(r) {}
-  virtual Value *eval(Env *env);
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
 
 class UnaryExpr : public Expr {
   ExprOp _op;
   Expr *_expr;
 public:
-  UnaryOp(ExprOp op, Expr *e) : _op(op), _expr(e) {}
-  virtual Value *eval(Env *env);
+  UnaryExpr(ExprOp op, Expr *e) : _op(op), _expr(e) {}
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
 
 class MemberRefExpr : public Expr {
@@ -134,15 +115,14 @@ class MemberRefExpr : public Expr {
 public:
   MemberRefExpr(Expr *object, const std::string& field)
     : _object(object), _field(field) {}
-  virtual Value *eval(Env *env);
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
 
 class ArrayRefExpr : public Expr {
-  Expr *_array, Expr *_index;
+  Expr *_array, *_index;
 public:
-  ArrayRefExpr(Expr *array, Expr *index) 
-    : _array(object), _index(index) {}
-  virtual Value *eval(Env *env);
+  ArrayRefExpr(Expr *array, Expr *index) : _array(array), _index(index) {}
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
 
 class CallExpr : public Expr {
@@ -151,7 +131,7 @@ class CallExpr : public Expr {
 public:
   CallExpr(Expr *f, std::list<Expr*> *args)
     : _func(f), _args(args) {}
-  virtual Value *eval(Env *env);
+  virtual std::ostream& print(std::ostream& os, int indent);  
 };
 
 #endif // EXPR_H

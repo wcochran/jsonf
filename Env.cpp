@@ -8,7 +8,7 @@ Value *Env::get(const std::string& name) {
     map<string,Value*>::iterator iter = env->_tbl.find(name);
     if (iter != _tbl.end())
       return iter->second;
-    env = env->prev;
+    env = env->_prev;
   } while (env);
   return 0;
 }

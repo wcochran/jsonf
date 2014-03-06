@@ -1,4 +1,5 @@
 %{
+#include <iostream>
 #include <vector>
 #include <list>
 #include <map>
@@ -6,26 +7,30 @@
 #include "Stmt.h"
 
 using namespace std;
+
+extern int yylex();
+extern void yyerror(const char *);
+
 %}
 
 %union {
   char *cstr;
   double num;
   Expr *expr;
-  list<Expr*> *exprs;
+  std::list<Expr*> *exprs;
   Member *member;
-  list<Member*> *members;
-  list<string> *strs;
+  std::list<Member*> *members;
+  std::list<std::string> *strs;
   Stmt *stmt;
-  list<Stmt*> *stmts;
+  std::list<Stmt*> *stmts;
   Var *var;
-  list<Var*> *vars;
+  std::list<Var*> *vars;
 }
 
 %token <cstr> STRING
 %token <cstr> IDENT
-%token <num> NUMBER
-%token TRUE FALSE NULL
+%token <num> NUM
+%token TRUE FALSE NULL_
 %token FUNC VAR IF ELSE WHILE RETURN
 
 %type <expr> object array value func expr
@@ -33,7 +38,7 @@ using namespace std;
 %type <member> pair
 %type <exprs> elements args actuals
 %type <strs> params formals
-%type <stmt> stmt block_stmt decl if_stmt while_stmt
+%type <stmt> stmt block_stmt decl if_stmt while_stmt return_stmt
 %type <stmts> stmts
 %type <var> var
 %type <vars> vars
@@ -52,7 +57,7 @@ using namespace std;
 
 %%
 
-start : object
+start : object                  {$1->print(cout,0);}
       ;
 
 object : '{' '}'                {$$ = new ObjectExpr;}
@@ -76,12 +81,12 @@ elements : expr                 {$$ = new list<Expr*>; $$->push_back($1);}
          ;
 
 value : STRING                  {$$ = new StringExpr($1);}
-      | NUMBER                  {$$ = new NumberExpr($1);}
+      | NUM                     {$$ = new NumExpr($1);}
       | object
       | array
       | TRUE                    {$$ = new BoolExpr(true);}
       | FALSE                   {$$ = new BoolExpr(false);}
-      | NULL                    {$$ = new NullExpr;}
+      | NULL_                   {$$ = new NullExpr;}
       | func
       ;
 
@@ -167,3 +172,12 @@ actuals : expr                 {$$ = new list<Expr*>; $$->push_back($1);}
         ;
 
 %%
+
+void yyerror(const char *msg) {
+  cerr << yylineno << ":" << msg << endl;
+}
+
+int main() {
+  yyparse();
+  return 0;
+}
