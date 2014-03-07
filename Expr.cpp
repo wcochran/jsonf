@@ -14,11 +14,6 @@ namespace {
 
 }
 
-void Member::print(ostream& os, int indent) {
-  os << _name << " : ";
-  _expr->print(os, indent);
-} 
-
 void ObjectExpr::print(ostream& os, int indent) {
   os << "{" << endl; 
   std::list<Member*>::iterator iter = _members->begin();
@@ -53,21 +48,6 @@ void ArrayExpr::print(ostream& os, int indent) {
   os << "]";
 }
 
-void StringExpr::print(ostream& os, int indent) {
-  os << _str;
-}
-
-void NumExpr::print(ostream& os, int indent) {
-  os << _num;
-}
-
-void BoolExpr::print(ostream& os, int indent) {
-  os << (_bool ? "true" : "false");
-}
-
-void NullExpr::print(ostream& os, int indent) {
-  os << "null";
-}
 
 void FuncExpr::print(ostream& os, int indent) {
   os << "\"<Func>\"";
@@ -103,7 +83,6 @@ namespace {
 
 }
  
-
 void BinaryExpr::print(ostream& os, int indent) {
   _left->print(os,indent);
   printOp(os, _op);

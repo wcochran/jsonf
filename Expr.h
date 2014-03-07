@@ -26,7 +26,10 @@ struct Member {
   Expr *_expr;
   Member(const std::string& n, Expr *e) 
     : _lineno(yylineno), _name(n), _expr(e) {}
-  virtual void print(std::ostream& os, int indent);  
+  virtual void print(std::ostream& os, int indent) {
+    os << _name << " : ";
+    _expr->print(os, indent);
+  } 
 };
 
 class ObjectExpr : public Expr {
@@ -47,27 +50,29 @@ class StringExpr : public Expr {
 public:
   const std::string _str;
   StringExpr(const std::string& s) : _str(s) {}
-  virtual void print(std::ostream& os, int indent);  
+  virtual void print(std::ostream& os, int indent) {os << _str;}
 };
 
 class NumExpr : public Expr {
 public:
   const double _num;
   NumExpr(double n) : _num(n) {}
-  virtual void print(std::ostream& os, int indent);  
+  virtual void print(std::ostream& os, int indent) {os << _num;}
 };
 
 class BoolExpr : public Expr {
 public:
   const bool _bool;
   BoolExpr(bool b) : _bool(b) {}
-  virtual void print(std::ostream& os, int indent);  
+  virtual void print(std::ostream& os, int indent) {
+    os << (_bool ? "true" : "false");
+  }
 };
 
 class NullExpr : public Expr {
 public:
   NullExpr() {}
-  virtual void print(std::ostream& os, int indent);  
+  virtual void print(std::ostream& os, int indent) {os << "null";}
 };
 
 class FuncExpr : public Expr {
