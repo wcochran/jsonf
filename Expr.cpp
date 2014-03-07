@@ -7,31 +7,35 @@ using namespace std;
 
 namespace {
 
-  inline ostream& spaces(ostream& os, int n) {
+  ostream& spaces(ostream& os, int n) {
     for (int i = 0; i < n; i++)
-      os << " ";
+      os << "  ";
     return os;
   }
 
 }
 
 ostream& Member::print(ostream& os, int indent) {
-  return os << _name << ":" << _expr->print(os, indent);
+  os << _name << " : ";
+  _expr->print(os, indent);
+  return os;
 } 
 
 ostream& ObjectExpr::print(ostream& os, int indent) {
-  os << "{" << endl;
+  os << "{" << endl; 
   std::list<Member*>::iterator iter = _members->begin();
   bool more = iter != _members->end();
   while (more) {
-    os << (*iter)->print(os, indent+1);
+    spaces(os, indent+1);
+    (*iter)->print(os, indent+1);
     ++iter;    
     more = iter != _members->end();
     if (more)
       os << ",";
     os << endl;
   }
-  return os << spaces(os, indent) << "}";
+  spaces(os, indent);
+  return os << "}";
 }
 
 ostream& ArrayExpr::print(ostream& os, int indent) {
@@ -39,14 +43,16 @@ ostream& ArrayExpr::print(ostream& os, int indent) {
   std::list<Expr*>::iterator iter = _elems->begin();
   bool more = iter != _elems->end();
   while (more) {
-    os << (*iter)->print(os, indent+1);
+    spaces(os, indent + 1);
+    (*iter)->print(os, indent+1);
     ++iter;    
     more = iter != _elems->end();
     if (more)
       os << ",";
     os << endl;
   }
-  return os << spaces(os, indent) << "]";
+  spaces(os, indent);
+  return os << "]";
 }
 
 ostream& StringExpr::print(ostream& os, int indent) {
@@ -58,7 +64,7 @@ ostream& NumExpr::print(ostream& os, int indent) {
 }
 
 ostream& BoolExpr::print(ostream& os, int indent) {
-  return os << _bool;
+  return os << (_bool ? "true" : "false");
 }
 
 ostream& NullExpr::print(ostream& os, int indent) {
@@ -122,7 +128,8 @@ ostream& CallExpr::print(ostream& os, int indent) {
   std::list<Expr*>::iterator iter = _args->begin();
   bool more = iter != _args->end();
   while (more) {
-    os << spaces(os, indent + 1) << (*iter)->print(os, indent+1);
+    spaces(os, indent + 1);
+    os << (*iter)->print(os, indent+1);
     ++iter;
     more = iter != _args->end();
     if (more)

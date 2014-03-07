@@ -26,7 +26,7 @@ if                       {return IF;}
 else                     {return ELSE;}
 while                    {return WHILE;}
 return                   {return RETURN;}
-\"[^"]&\"                {yylval.cstr = strdup(yytext); return STRING;}
+\"[^"]*\"                {yylval.cstr = strdup(yytext); return STRING;}
 [a-zA-Z_][a-zA-Z_0-9]*   {yylval.cstr = strdup(yytext); return IDENT;}
 [0-9]*(\.[0-9]+)?        {yylval.num = atof(yytext); return NUM;}
 "||"                     {return OR;}

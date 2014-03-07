@@ -57,7 +57,7 @@ extern void yyerror(const char *);
 
 %%
 
-start : object                  {$1->print(cout,0);}
+start : object                  {$1->print(cout,0); cout << endl;}
       ;
 
 object : '{' '}'                {$$ = new ObjectExpr;}
@@ -175,6 +175,7 @@ actuals : expr                 {$$ = new list<Expr*>; $$->push_back($1);}
 
 void yyerror(const char *msg) {
   cerr << yylineno << ":" << msg << endl;
+  exit(-1);
 }
 
 int main() {

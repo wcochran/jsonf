@@ -1,4 +1,4 @@
-CXX=g++
+CXX=c++
 CXXFLAGS=-g -Wall -ferror-limit=1 -Wno-unused-private-field
 ALL=jsonf
 
