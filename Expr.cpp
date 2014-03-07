@@ -106,36 +106,47 @@ namespace {
  
 
 ostream& BinaryExpr::print(ostream& os, int indent) {
-  return os << _left->print(os,indent) << printOp(os, _op) 
-	    << _right->print(os, indent);
+  _left->print(os,indent);
+  printOp(os, _op);
+  _right->print(os, indent);
+  return os;
 }
 
 ostream& UnaryExpr::print(ostream& os, int indent) {
-  return os << printOp(os, _op) << _expr->print(os, indent);
+  printOp(os, _op);
+  _expr->print(os, indent);
+  return os;
 }
 
 ostream& MemberRefExpr::print(ostream& os, int indent) {
-  return os << _object->print(os, indent) << " . " << _field;
+  _object->print(os, indent);
+  os << " . " << _field;
+  return os;
 }
 
 ostream& ArrayRefExpr::print(ostream& os, int indent) {
-  return os << _array->print(os, indent) << " [ " 
-	    << _index->print(os, indent) << " ] ";
+  _array->print(os, indent);
+  os << " [ ";
+  _index->print(os, indent);
+  os << " ] ";
+  return os;
 }
 
 ostream& CallExpr::print(ostream& os, int indent) {
-  return os << _func->print(os, indent) << " ( " << endl;
+  _func->print(os, indent);
+  os << " ( " << endl;
   std::list<Expr*>::iterator iter = _args->begin();
   bool more = iter != _args->end();
   while (more) {
     spaces(os, indent + 1);
-    os << (*iter)->print(os, indent+1);
+    (*iter)->print(os, indent+1);
     ++iter;
     more = iter != _args->end();
     if (more)
       os << ",";
     os << endl;
   }
-  return os << ")";
+  os << ")";
+  return os;
 }
 

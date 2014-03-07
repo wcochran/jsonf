@@ -1,0 +1,6 @@
+{
+  "foo" : "bar",
+  doo  : 123.4,
+  dad : ["fred",xx  true, false, 4321],
+  "diddly" : {x : 0, y : null}
+}
