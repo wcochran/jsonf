@@ -15,6 +15,15 @@ namespace {
 
 }
 
+ObjectExpr::~ObjectExpr() {
+  if (_members) {
+    for (list<Member*>::iterator iter = _members->begin();
+	 iter != _members->end(); ++iter)
+      delete *iter;
+    delete _members;
+  }
+}
+
 void ObjectExpr::print(ostream& os, int indent) {
   os << "{" << endl; 
   std::list<Member*>::iterator iter = _members->begin();
@@ -30,6 +39,15 @@ void ObjectExpr::print(ostream& os, int indent) {
   }
   spaces(os, indent);
   os << "}";
+}
+
+ArrayExpr::~ArrayExpr() {
+  if (_elems) {
+    for (list<Expr*>::iterator iter = _elems->begin();
+	 iter != _elems->end(); ++iter)
+      delete *iter;
+    delete _elems;
+  }
 }
 
 void ArrayExpr::print(ostream& os, int indent) {
@@ -49,6 +67,11 @@ void ArrayExpr::print(ostream& os, int indent) {
   os << "]";
 }
 
+
+FuncExpr::~FuncExpr() {
+  delete _params; 
+  delete _body;
+}
 
 void FuncExpr::print(ostream& os, int indent) {
   os << "func (";
@@ -114,6 +137,16 @@ void ArrayRefExpr::print(ostream& os, int indent) {
   os << " [ ";
   _index->print(os, indent);
   os << " ] ";
+}
+
+CallExpr::~CallExpr() {
+  delete _func;
+  list<Expr*>::iterator iter = _args->begin();
+  while (iter != _args->end()) {
+    delete *iter;
+    ++iter;
+  }
+  delete _args;
 }
 
 void CallExpr::print(ostream& os, int indent) {

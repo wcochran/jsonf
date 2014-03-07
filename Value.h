@@ -6,8 +6,6 @@
 #include <list>
 #include <vector>
 
-class Expr;
-
 enum ValueType {
   STRING_VALUE,
   NUM_VALUE,
@@ -57,8 +55,7 @@ struct NullValue : public Value {
 };
 
 struct FuncValue : public Value {
-  Expr *_func;
-  FuncValue(Expr *f) : Value(FUNC_VALUE), _func(f) {}
+  FuncValue() : Value(FUNC_VALUE) {}
 };
 
 #endif // VALUE_H

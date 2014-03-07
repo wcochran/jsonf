@@ -12,6 +12,15 @@ namespace {
 
 }
 
+BlockStmt::~BlockStmt() {
+  list<Stmt*>::iterator iter = _stmts->begin();
+  while (iter != _stmts->end()) {
+    delete *iter;
+    ++iter;
+  }
+  delete _stmts;
+}
+
 void BlockStmt::print(ostream& os, int indent) {
   os << "{" << endl;
   list<Stmt*>::iterator iter = _stmts->begin();
@@ -33,6 +42,15 @@ void Var::print(ostream& os, int indent) {
     os << " = ";
     _expr->print(os, indent);
   }
+}
+
+DeclStmt::~DeclStmt() {
+  list<Var*>::iterator iter = _vars->begin();
+  while (iter != _vars->end()) {
+    delete *iter;
+    ++iter;
+  }
+  delete _vars;
 }
 
 void DeclStmt::print(ostream& os, int indent) {

@@ -57,7 +57,8 @@ extern void yyerror(const char *);
 
 %%
 
-start : object                  {$1->print(cout,0); cout << endl;}
+start : object                  {$1->print(cout,0); cout << endl;
+                                 delete $1;}
       ;
 
 object : '{' '}'                {$$ = new ObjectExpr;}

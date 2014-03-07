@@ -27,7 +27,8 @@ struct Member {
   Expr *_expr;
   Member(const std::string& n, Expr *e) 
     : _lineno(yylineno), _name(n), _expr(e) {}
-  virtual void print(std::ostream& os, int indent) {
+  ~Member() {delete _expr;}
+  void print(std::ostream& os, int indent) {
     os << _name << " : ";
     _expr->print(os, indent);
   } 
@@ -37,6 +38,7 @@ class ObjectExpr : public Expr {
   std::list<Member*> *_members;
 public:
   ObjectExpr(std::list<Member*> *members = 0) : _members(members) {}
+  virtual ~ObjectExpr();
   virtual void print(std::ostream& os, int indent);  
 };
 
@@ -44,6 +46,7 @@ class ArrayExpr : public Expr {
   std::list<Expr*> *_elems;
 public:
   ArrayExpr(std::list<Expr*> *elems = 0) : _elems(elems) {}
+  virtual ~ArrayExpr();
   virtual void print(std::ostream& os, int indent);  
 };
 
@@ -82,6 +85,7 @@ class FuncExpr : public Expr {
 public:
   FuncExpr(std::list<std::string> *params, Stmt *body) 
     : _params(params), _body(body) {}
+  virtual ~FuncExpr();
   virtual void print(std::ostream& os, int indent);  
 };
 
@@ -89,6 +93,7 @@ class AssignExpr : public Expr {
   Expr *_lval, *_rval;
 public:
   AssignExpr(Expr *lval, Expr *rval) : _lval(lval), _rval(rval) {}
+  virtual ~AssignExpr() {delete _lval; delete _rval;}
   virtual void print(std::ostream& os, int indent);  
 };
 
@@ -104,6 +109,7 @@ class BinaryExpr : public Expr {
   Expr *_left, *_right;
 public:
   BinaryExpr(ExprOp op, Expr *l, Expr *r) : _op(op), _left(l), _right(r) {}
+  virtual ~BinaryExpr() {delete _left; delete _right;}
   virtual void print(std::ostream& os, int indent);  
 };
 
@@ -112,6 +118,7 @@ class UnaryExpr : public Expr {
   Expr *_expr;
 public:
   UnaryExpr(ExprOp op, Expr *e) : _op(op), _expr(e) {}
+  virtual ~UnaryExpr() {delete _expr;}
   virtual void print(std::ostream& os, int indent);  
 };
 
@@ -121,6 +128,7 @@ class MemberRefExpr : public Expr {
 public:
   MemberRefExpr(Expr *object, const std::string& field)
     : _object(object), _field(field) {}
+  virtual ~MemberRefExpr() {delete _object;}
   virtual void print(std::ostream& os, int indent);  
 };
 
@@ -128,6 +136,7 @@ class ArrayRefExpr : public Expr {
   Expr *_array, *_index;
 public:
   ArrayRefExpr(Expr *array, Expr *index) : _array(array), _index(index) {}
+  virtual ~ArrayRefExpr() {delete _array; delete _index;}
   virtual void print(std::ostream& os, int indent);  
 };
 
@@ -137,6 +146,7 @@ class CallExpr : public Expr {
 public:
   CallExpr(Expr *f, std::list<Expr*> *args)
     : _func(f), _args(args) {}
+  virtual ~CallExpr();
   virtual void print(std::ostream& os, int indent);  
 };
 
