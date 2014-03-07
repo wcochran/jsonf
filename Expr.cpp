@@ -7,21 +7,19 @@ using namespace std;
 
 namespace {
 
-  ostream& spaces(ostream& os, int n) {
+  void spaces(ostream& os, int n) {
     for (int i = 0; i < n; i++)
       os << "  ";
-    return os;
   }
 
 }
 
-ostream& Member::print(ostream& os, int indent) {
+void Member::print(ostream& os, int indent) {
   os << _name << " : ";
   _expr->print(os, indent);
-  return os;
 } 
 
-ostream& ObjectExpr::print(ostream& os, int indent) {
+void ObjectExpr::print(ostream& os, int indent) {
   os << "{" << endl; 
   std::list<Member*>::iterator iter = _members->begin();
   bool more = iter != _members->end();
@@ -35,10 +33,10 @@ ostream& ObjectExpr::print(ostream& os, int indent) {
     os << endl;
   }
   spaces(os, indent);
-  return os << "}";
+  os << "}";
 }
 
-ostream& ArrayExpr::print(ostream& os, int indent) {
+void ArrayExpr::print(ostream& os, int indent) {
   os << "[" << endl;
   std::list<Expr*>::iterator iter = _elems->begin();
   bool more = iter != _elems->end();
@@ -52,36 +50,38 @@ ostream& ArrayExpr::print(ostream& os, int indent) {
     os << endl;
   }
   spaces(os, indent);
-  return os << "]";
+  os << "]";
 }
 
-ostream& StringExpr::print(ostream& os, int indent) {
-  return os << _str;
+void StringExpr::print(ostream& os, int indent) {
+  os << _str;
 }
 
-ostream& NumExpr::print(ostream& os, int indent) {
-  return os << _num;
+void NumExpr::print(ostream& os, int indent) {
+  os << _num;
 }
 
-ostream& BoolExpr::print(ostream& os, int indent) {
-  return os << (_bool ? "true" : "false");
+void BoolExpr::print(ostream& os, int indent) {
+  os << (_bool ? "true" : "false");
 }
 
-ostream& NullExpr::print(ostream& os, int indent) {
-  return os << "null";
+void NullExpr::print(ostream& os, int indent) {
+  os << "null";
 }
 
-ostream& FuncExpr::print(ostream& os, int indent) {
-  return os << "\"<Func>\"";
+void FuncExpr::print(ostream& os, int indent) {
+  os << "\"<Func>\"";
 }
 
-ostream& AssignExpr::print(ostream& os, int indent) {
-  return os << _lval->print(os, indent) << " = " << _rval->print(os, indent);
+void AssignExpr::print(ostream& os, int indent) {
+  _lval->print(os, indent);
+  os << " = ";
+  _rval->print(os, indent);
 }
 
 namespace {
 
-  ostream& printOp(ostream& os, ExprOp op) {
+  void printOp(ostream& os, ExprOp op) {
     switch(op) {
     case OR_OP:   os << " || "; break;
     case AND_OP:  os << " && "; break;
@@ -99,40 +99,35 @@ namespace {
     case NOT_OP:  os << " ! "; break;
     case NEG_OP:  os << " - "; break;
     }
-    return os;
   }
 
 }
  
 
-ostream& BinaryExpr::print(ostream& os, int indent) {
+void BinaryExpr::print(ostream& os, int indent) {
   _left->print(os,indent);
   printOp(os, _op);
   _right->print(os, indent);
-  return os;
 }
 
-ostream& UnaryExpr::print(ostream& os, int indent) {
+void UnaryExpr::print(ostream& os, int indent) {
   printOp(os, _op);
   _expr->print(os, indent);
-  return os;
 }
 
-ostream& MemberRefExpr::print(ostream& os, int indent) {
+void MemberRefExpr::print(ostream& os, int indent) {
   _object->print(os, indent);
   os << " . " << _field;
-  return os;
 }
 
-ostream& ArrayRefExpr::print(ostream& os, int indent) {
+void ArrayRefExpr::print(ostream& os, int indent) {
   _array->print(os, indent);
   os << " [ ";
   _index->print(os, indent);
   os << " ] ";
-  return os;
 }
 
-ostream& CallExpr::print(ostream& os, int indent) {
+void CallExpr::print(ostream& os, int indent) {
   _func->print(os, indent);
   os << " ( " << endl;
   std::list<Expr*>::iterator iter = _args->begin();
@@ -147,6 +142,5 @@ ostream& CallExpr::print(ostream& os, int indent) {
     os << endl;
   }
   os << ")";
-  return os;
 }
 
