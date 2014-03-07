@@ -17,8 +17,9 @@ clobber:
 
 Env.o: Env.cpp Env.h Value.h
 Expr.o: Expr.cpp Expr.h 
+Stmt.o: Stmt.cpp Stmt.h Expr.h
 
-OBJS=Expr.o Env.o
+OBJS=Expr.o Env.o Stmt.o
 
 jsonf: jsonf.ypp jsonf.l $(OBJS)
 	bison -d jsonf.ypp

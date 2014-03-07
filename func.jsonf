@@ -3,6 +3,12 @@
   g : func() { return 0; }, 
   f : func (x, y) {
     var z = 1 + 2*y + x;
+    while (z > 0) {
+      g();
+      z = z - 1;
+      if (x % 2 == 1)
+        return 3*x;
+    }
     return 0;
   },
   doo  : 123.4,

@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include "Expr.h"
+#include "Stmt.h"
 
 using namespace std;
 
@@ -50,7 +51,16 @@ void ArrayExpr::print(ostream& os, int indent) {
 
 
 void FuncExpr::print(ostream& os, int indent) {
-  os << "\"<Func>\"";
+  os << "func (";
+  list<string>::iterator iter = _params->begin();
+  while (iter != _params->end()) {
+    os << *iter;
+    ++iter;
+    if (iter != _params->end())
+      os << ", ";
+  }
+  os << ") ";
+  _body->print(os, indent+1);
 }
 
 void AssignExpr::print(ostream& os, int indent) {
@@ -108,17 +118,15 @@ void ArrayRefExpr::print(ostream& os, int indent) {
 
 void CallExpr::print(ostream& os, int indent) {
   _func->print(os, indent);
-  os << " ( " << endl;
+  os << " (";
   std::list<Expr*>::iterator iter = _args->begin();
   bool more = iter != _args->end();
   while (more) {
-    spaces(os, indent + 1);
     (*iter)->print(os, indent+1);
     ++iter;
     more = iter != _args->end();
     if (more)
       os << ",";
-    os << endl;
   }
   os << ")";
 }
