@@ -134,4 +134,11 @@ public:
   virtual void print(std::ostream& os, int indent);  
 };
 
+class VarExpr : public Expr {
+  const std::string _var;
+public:
+  VarExpr(const std::string& v) : _var(v) {}
+  virtual void print(std::ostream& os, int indent) {os << _var;}
+};
+
 #endif // EXPR_H

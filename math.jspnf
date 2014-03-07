@@ -1,0 +1,6 @@
+{
+  "foo" : "bar" + "fly",
+  doo  : 123.4 / 6 - 2,
+  dad : ["fred", true, false, [9 + 7], 4321 % 6],
+  "diddly" : {x : 2 + 3 * 4, y : null}
+}

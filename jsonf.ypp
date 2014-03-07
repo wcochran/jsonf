@@ -160,6 +160,7 @@ expr : expr '=' expr           {$$ = new AssignExpr($1,$3);}
      | expr '.' IDENT          {$$ = new MemberRefExpr($1,$3);}
      | expr '[' expr ']'       {$$ = new ArrayRefExpr($1,$3);}
      | expr '(' args ')'       {$$ = new CallExpr($1,$3);}
+     | IDENT                   {$$ = new VarExpr($1);}
      | value
      ;
 

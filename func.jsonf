@@ -1,0 +1,11 @@
+{
+  "foo" : "bar",
+  g : func() { return 0; }, 
+  f : func (x, y) {
+    var z = 1 + 2*y + x;
+    return 0;
+  },
+  doo  : 123.4,
+  dad : ["fred", true, false, 4321],
+  "diddly" : {x : 0, y : null}
+}

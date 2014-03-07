@@ -121,6 +121,7 @@ expr : expr '=' expr
      | expr '.' IDENT
      | expr '[' expr ']'
      | expr '(' args ')'
+     | IDENT
      | value
      ;
 
